@@ -15,313 +15,122 @@ namespace CnC_Hack
 	class Program
 	{
 		#region "Stuff"
-		[Flags]
-		public enum ProcessAccessFlags : uint
-		{
-			All = 0x001F0FFF,
-			Terminate = 0x00000001,
-			CreateThread = 0x00000002,
-			VMOperation = 0x00000008,
-			VMRead = 0x00000010,
-			VMWrite = 0x00000020,
-			DupHandle = 0x00000040,
-			SetInformation = 0x00000200,
-			QueryInformation = 0x00000400,
-			Synchronize = 0x00100000
-		}
-
 		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
 		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern bool ReadProcessMemory(IntPtr hProcess, int lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
-		[DllImport("kernel32.dll")]
-		static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
-
-		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern bool WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] buffer, int size, out int lpNumberOfBytesWritten);
-		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern bool WriteProcessMemory(IntPtr hProcess, int lpBaseAddress, [Out] byte[] buffer, int size, out int lpNumberOfBytesWritten);
-		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] buffer, int size, out int lpNumberOfBytesWritten);
-
-		[DllImport("kernel32.dll")]
-		public static extern Int32 CloseHandle(IntPtr hProcess);
-
-		const int PROCESS_ALL_ACCESS = 0x1F0FFF;
-		static Process process;  //search value
-		static int segment = 0x10000; //avoid the large object heap (> 84k)
-		static int range = 0x7FFFFFFF - segment; //32-bit example
-		static Dictionary<int, string> addresses = new Dictionary<int, string>();
 		#endregion
 
 		#region "Offsets"
 		static int gameModul = 0x400000;
-		static int playerbase = 0x58ED40;
+		static int playerbase = 0x56C9B0;
+		static int[] MoneyVOffset = { 0xC, 0x34 };
+		static int[] RankVOffset = { 0xC, 0x17C };
+		static int[] EXPVOffset = { 0xC, 0x178 };
+		static int[] StarRankVOffset = { 0xC, 0x174 };
+		static int[] EnergieCurrOffset = { 0xC, 0x78 };
+		static int[] EnergieMaxOffset = { 0xC, 0x74 };
 		#endregion
+
+		static bool hackActive = false;
+		static short curItem = 0, c;
+		static ConsoleKeyInfo key;
+		static string[] menuItems = { "Start Hack", "Exit" };
+		static Process process;  //search value
+		static BackgroundWorker bwHack = new BackgroundWorker();
 
 		static unsafe void Main(string[] args)
 		{
 			Console.WriteLine("Looking for Generals.exe...");
-			while(Process.GetProcessesByName("Generals").Count() == 0){ }
+			while (Process.GetProcessesByName("Generals").Count() == 0) { }
 			Console.WriteLine("Generals.exe found!");
-			process = Process.GetProcessesByName("Generals")[0];
 			Console.Clear();
-			int bytesRead;
-			bool nextValue = false;
-			int userInput = 0;
+			process = Process.GetProcessesByName("Generals")[0];
+			bwHack.DoWork += BwHack_DoWork;
+			DisplayMenu();
+		}
+
+		private static void BwHack_DoWork(object sender, DoWorkEventArgs e)
+		{
+			while (hackActive)
+			{
+				hack(696969, MoneyVOffset[0], MoneyVOffset[1]); //Money
+				hack(69, RankVOffset[0], RankVOffset[1]); //RankPoints
+				hack(5000, EXPVOffset[0], EXPVOffset[1]); //RankEXP -> LevelUp to get StarRank
+				hack(5, StarRankVOffset[0], StarRankVOffset[1]); //StarRank -> does NOT unlock 5-Star-Features direktly!
+				hack(0, EnergieCurrOffset[0], EnergieCurrOffset[1]); //Current Used Energy
+				hack(999, EnergieMaxOffset[0], EnergieMaxOffset[1]); //Max Current Energy
+				Thread.Sleep(1000);
+			}
+		}
+		public static bool hack(int value, Int32 off1, Int32 off2)
+		{
+			byte[] buffer = new byte[4];
+			IntPtr baseAddr = new IntPtr(gameModul + playerbase);
+			IntPtr offsetAddress;
+			ReadProcessMemory(process.Handle, baseAddr, buffer, buffer.Length, out int refer);
+			offsetAddress = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+			ReadProcessMemory(process.Handle, IntPtr.Add(offsetAddress, off1), buffer, buffer.Length, out refer);
+			offsetAddress = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+			buffer = StructureToByteArray(value);
+			bool written = WriteProcessMemory(process.Handle, IntPtr.Add(offsetAddress, off2), buffer, buffer.Length, out refer);
+			return written;
+		}
+		static public void DisplayMenu()
+		{
 			do
 			{
-				userInput = DisplayMenu(nextValue);
-				if (userInput == 55)
+				Console.Clear();
+				Console.WriteLine("================ CnC Generals Hack V1 ================");
+				Console.WriteLine("");
+				// The loop that goes through all of the menu items.
+				for (c = 0; c < menuItems.Length; c++)
 				{
-					if (nextValue)
-						Console.Write("Enter next Value: ");
+					if (hackActive)
+						menuItems[0] = "Stop Hack";
 					else
-						Console.Write("Enter new Value: ");
-
-					string value = Console.ReadLine();
-					DateTime start = DateTime.Now;
-					if (nextValue)
-						bytesRead = lookDeeper(int.Parse(value));
-					else
-						bytesRead = lookForValue(int.Parse(value));
-					Console.WriteLine();
-					Console.WriteLine("Duration: {0} seconds", (DateTime.Now - start).TotalSeconds);
-					Console.WriteLine("Found: {0}", addresses.Count);
-					Console.WriteLine();
-					nextValue = true;
-				}
-				else if (userInput == 56)
-				{
-					foreach (KeyValuePair<int, string> addr in addresses)
+						menuItems[0] = "Start Hack";
+					if (curItem == c)
 					{
-						Console.WriteLine(addr.Key.ToString("X") + " -> " + addr.Value);
+						Console.Write(">>");
+						Console.WriteLine(menuItems[c]);
 					}
-				}
-				else if (userInput == 1)
-				{
-					hackRank();
-				}
-				else if (userInput == 2)
-				{
-					hackMoney(999999);
-				}
-				else if (userInput == 10)
-				{
-					nextValue = false;
+					else
+					{
+						Console.WriteLine(menuItems[c]);
+					}
 				}
 				Console.WriteLine("");
-				Console.WriteLine("");
-			} while (userInput != 99);
-			Console.Clear();
-		}
-		public static unsafe int lookForValue(int value)
-		{
-			int bytesRead = 0;
-			for (int i = 0; i < range; i += segment)
+				Console.Write("Select your choice with the arrow keys.");
+				key = Console.ReadKey(true);
+				if (key.Key.ToString() == "DownArrow")
+				{
+					curItem++;
+					if (curItem > menuItems.Length - 1) curItem = 0;
+				}
+				else if (key.Key.ToString() == "UpArrow")
+				{
+					curItem--;
+					if (curItem < 0) curItem = Convert.ToInt16(menuItems.Length - 1);
+				}
+			} while (key.KeyChar != 13);
+			switch (curItem)
 			{
-				byte[] buffer = new byte[segment];
-
-				if (!ReadProcessMemory(process.Handle, new IntPtr(i), buffer, segment, out bytesRead))
-				{
-					continue;
-				}
-				IntPtr data = Marshal.AllocHGlobal(bytesRead);
-				Marshal.Copy(buffer, 0, data, bytesRead);
-				for (int j = 0; j < bytesRead; j++)
-				{
-					int current = *(int*)(data + j);
-
-					if (current == value)
-					{
-						addresses.Add(i + j, value.ToString());
-					}
-				}
-				Marshal.FreeHGlobal(data);
-			}
-			return bytesRead;
-		}
-		public static unsafe int lookDeeper(int value)
-		{
-			Dictionary<int, string> newAddr = addresses;
-			addresses = new Dictionary<int, string>();
-			int bytesRead = 0;
-			for (int i = 0; i < range; i += segment)
-			{
-				byte[] buffer = new byte[segment];
-
-				if (!ReadProcessMemory(process.Handle, new IntPtr(i), buffer, segment, out bytesRead))
-				{
-					continue;
-				}
-
-				IntPtr data = Marshal.AllocHGlobal(bytesRead);
-				Marshal.Copy(buffer, 0, data, bytesRead);
-				for (int j = 0; j < bytesRead; j++)
-				{
-					int current = *(int*)(data + j);
-
-					if (current == value)
-					{
-						foreach (KeyValuePair<int, string> addr in newAddr)
-						{
-							if (addr.Key == (i + j))
-							{
-								string saddr = (i + j).ToString("X");
-								if (saddr.StartsWith("5") && saddr.EndsWith("2B0") && saddr.Length == ("5".Length + 3 + "2B0".Length))
-								{
-									Console.WriteLine("Success on: " + saddr + "    with value: " + current.ToString());
-									addresses.Add(i + j, current.ToString());
-								}
-							}
-
-						}
-					}
-				}
-
-				Marshal.FreeHGlobal(data);
+				case 0:
+					hackActive = !hackActive;
+					if(hackActive)
+						bwHack.RunWorkerAsync();
+					DisplayMenu();
+					break;
+				case 1:
+					break;
+				default:
+					DisplayMenu();
+					break;
 			}
 
-			return bytesRead;
-		}
-		public static bool hackMoney(int value)
-		{
-            if(TryhackMoney(value, 0x2C, 0x18, 0x4, 0x18, 0x440))
-            {
-                return true;
-            }
-            else
-            {
-                if (TryhackMoney(value, 0x2C, 0x18, 0x2C, 0x18, 0x440))
-                {
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("");
-                    Console.WriteLine("===============================================================");
-                    Console.WriteLine("Could not write right MemoryAdress");
-                    Console.WriteLine("===============================================================");
-                    Console.WriteLine("");
-                    return false;
-                }
-            }
-		}
-        public static bool hackRank()
-        {
-            if (TryhackRank(0x2C, 0x18, 0x4, 0x18, 0x588))
-            {
-                return true;
-            }
-            else
-            {
-                if (TryhackRank(0x2C, 0x18, 0x2C, 0x18, 0x588))
-                {
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("");
-                    Console.WriteLine("===============================================================");
-                    Console.WriteLine("Could not write right MemoryAdress");
-                    Console.WriteLine("===============================================================");
-                    Console.WriteLine("");
-                    return false;
-                }
-            }
-        }
-
-        public static bool TryhackRank(Int32 off1, Int32 off2, Int32 off3, Int32 off4, Int32 off5)
-		{
-			byte[] buffer = new byte[16];
-			int baseAddr = gameModul + playerbase;
-			Console.WriteLine(baseAddr.ToString("X"));
-			ReadProcessMemory(process.Handle, baseAddr, buffer, buffer.Length, out int refer);
-			int newaddres1 = BitConverter.ToInt32(buffer, 0);
-			IntPtr addr = (IntPtr)(newaddres1);
-			Console.WriteLine(addr.ToString("X"));
-
-			ReadProcessMemory(process.Handle, (newaddres1 + off1), buffer, buffer.Length, out refer);
-			int newaddres2 = BitConverter.ToInt32(buffer, 0);
-			IntPtr addr2 = (IntPtr)(newaddres2);
-
-			ReadProcessMemory(process.Handle, (newaddres2 + off2), buffer, buffer.Length, out refer);
-			int newaddres3 = BitConverter.ToInt32(buffer, 0);
-			IntPtr addr3 = (IntPtr)(newaddres3);
-
-			ReadProcessMemory(process.Handle, (newaddres3 + off3), buffer, buffer.Length, out refer);
-			int newaddres4 = BitConverter.ToInt32(buffer, 0);
-			IntPtr addr4 = (IntPtr)(newaddres4);
-
-			ReadProcessMemory(process.Handle, (newaddres4 + off4), buffer, buffer.Length, out refer);
-			int newaddres5 = BitConverter.ToInt32(buffer, 0);
-			IntPtr addr5 = (IntPtr)(newaddres5);
-
-			buffer = StructureToByteArray(69);
-			bool written = WriteProcessMemory(process.Handle, (newaddres5 + off5), buffer, buffer.Length, out refer);
-			buffer = new byte[4];
-			ReadProcessMemory(process.Handle, (newaddres5 + off5), buffer, buffer.Length, out refer);
-			int value = BitConverter.ToInt32(buffer, 0);
-			if (value == 69)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-        public static bool TryhackMoney(int value, Int32 off1, Int32 off2, Int32 off3, Int32 off4, Int32 off5)
-        {
-            byte[] buffer = new byte[4];
-            IntPtr baseAddr = new IntPtr(gameModul + playerbase);
-            ReadProcessMemory(process.Handle, baseAddr, buffer, buffer.Length, out int refer);
-            IntPtr newaddres1 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres1, off1), buffer, buffer.Length, out refer);
-            IntPtr newaddres2 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres2, off2), buffer, buffer.Length, out refer);
-            IntPtr newaddres3 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres3, off3), buffer, buffer.Length, out refer);
-            IntPtr newaddres4 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres4, off4), buffer, buffer.Length, out refer);
-            IntPtr newaddres5 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-            buffer = StructureToByteArray(value);
-            bool written = WriteProcessMemory(process.Handle, IntPtr.Add(newaddres5, off5), buffer, buffer.Length, out refer);
-            buffer = new byte[4];
-            IntPtr checkAddr = new IntPtr(gameModul + 0x5318E4);
-            ReadProcessMemory(process.Handle, checkAddr, buffer, buffer.Length, out refer);
-            int newvalue = BitConverter.ToInt32(buffer, 0);
-            if (value == newvalue)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-		static public int DisplayMenu(bool next)
-		{
-			Console.WriteLine("CnC Hack");
-			Console.WriteLine();
-			Console.WriteLine("1. Hack Rank ");
-			//if (next)
-			//	Console.WriteLine("1. Search next Value");
-			//else
-			//	Console.WriteLine("1. Search Value (Value entered by YOU!)");
-			//Console.WriteLine("2. List Addresses from last scan");
-			Console.WriteLine("2. Hack Money");
-			Console.WriteLine("10. Restart Scan");
-			Console.WriteLine("99. Exit");
-			var result = Console.ReadLine();
-			return Convert.ToInt32(result);
 		}
 		private static byte[] StructureToByteArray(object obj)
 		{
@@ -337,5 +146,6 @@ namespace CnC_Hack
 
 			return arr;
 		}
+
 	}
 }
