@@ -100,7 +100,7 @@ namespace CnC_Hack
 				}
 				else if (userInput == 1)
 				{
-					hackRankV1();
+					hackRank();
 				}
 				else if (userInput == 2)
 				{
@@ -186,49 +186,52 @@ namespace CnC_Hack
 		}
 		public static bool hackMoney(int value)
 		{
-			byte[] buffer = new byte[4];
-			IntPtr baseAddr = new IntPtr(gameModul + playerbase);
-			ReadProcessMemory(process.Handle, baseAddr, buffer, buffer.Length, out int refer);
-			IntPtr newaddres1 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-			ReadProcessMemory(process.Handle, IntPtr.Add(newaddres1, 0x2C), buffer, buffer.Length, out refer);
-			IntPtr newaddres2 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-			ReadProcessMemory(process.Handle, IntPtr.Add(newaddres2, 0x18), buffer, buffer.Length, out refer);
-			IntPtr newaddres3 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-			ReadProcessMemory(process.Handle, IntPtr.Add(newaddres3, 0x4), buffer, buffer.Length, out refer);
-			IntPtr newaddres4 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-			ReadProcessMemory(process.Handle, IntPtr.Add(newaddres4, 0x18), buffer, buffer.Length, out refer);
-			IntPtr newaddres5 = new IntPtr(BitConverter.ToInt32(buffer, 0));
-
-			buffer = StructureToByteArray(value);
-			bool written = WriteProcessMemory(process.Handle, IntPtr.Add(newaddres5, 0x440), buffer, buffer.Length, out refer);
-			buffer = new byte[4];
-			ReadProcessMemory(process.Handle, IntPtr.Add(newaddres5, 0x440), buffer, buffer.Length, out refer);
-			int newvalue = BitConverter.ToInt32(buffer, 0);
-			if (value == newvalue && written)
-			{
-				return true;
-			}
-			else
-			{
-				Console.WriteLine("");
-				Console.WriteLine("===============================================================");
-				Console.WriteLine("Could not write right MemoryAdress: ");
-				Console.WriteLine("0 HEX: " + baseAddr.ToString("X"));
-				Console.WriteLine("1 HEX: " + newaddres1.ToString("X"));
-				Console.WriteLine("2 HEX: " + newaddres2.ToString("X"));
-				Console.WriteLine("3 HEX: " + newaddres3.ToString("X"));
-				Console.WriteLine("4 HEX: " + newaddres4.ToString("X"));
-				Console.WriteLine("5 HEX: " + newaddres5.ToString("X"));
-				Console.WriteLine("===============================================================");
-				Console.WriteLine("");
-				return false;
-			}
+            if(TryhackMoney(value, 0x2C, 0x18, 0x4, 0x18, 0x440))
+            {
+                return true;
+            }
+            else
+            {
+                if (TryhackMoney(value, 0x2C, 0x18, 0x2C, 0x18, 0x440))
+                {
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("===============================================================");
+                    Console.WriteLine("Could not write right MemoryAdress");
+                    Console.WriteLine("===============================================================");
+                    Console.WriteLine("");
+                    return false;
+                }
+            }
 		}
-		public static bool hackRankV1()
+        public static bool hackRank()
+        {
+            if (TryhackRank(0x2C, 0x18, 0x4, 0x18, 0x588))
+            {
+                return true;
+            }
+            else
+            {
+                if (TryhackRank(0x2C, 0x18, 0x2C, 0x18, 0x588))
+                {
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("===============================================================");
+                    Console.WriteLine("Could not write right MemoryAdress");
+                    Console.WriteLine("===============================================================");
+                    Console.WriteLine("");
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryhackRank(Int32 off1, Int32 off2, Int32 off3, Int32 off4, Int32 off5)
 		{
 			byte[] buffer = new byte[16];
 			int baseAddr = gameModul + playerbase;
@@ -238,48 +241,72 @@ namespace CnC_Hack
 			IntPtr addr = (IntPtr)(newaddres1);
 			Console.WriteLine(addr.ToString("X"));
 
-			ReadProcessMemory(process.Handle, (newaddres1 + 0x2C), buffer, buffer.Length, out refer);
+			ReadProcessMemory(process.Handle, (newaddres1 + off1), buffer, buffer.Length, out refer);
 			int newaddres2 = BitConverter.ToInt32(buffer, 0);
 			IntPtr addr2 = (IntPtr)(newaddres2);
 
-			ReadProcessMemory(process.Handle, (newaddres2 + 0x18), buffer, buffer.Length, out refer);
+			ReadProcessMemory(process.Handle, (newaddres2 + off2), buffer, buffer.Length, out refer);
 			int newaddres3 = BitConverter.ToInt32(buffer, 0);
 			IntPtr addr3 = (IntPtr)(newaddres3);
 
-			ReadProcessMemory(process.Handle, (newaddres3 + 0x4), buffer, buffer.Length, out refer);
+			ReadProcessMemory(process.Handle, (newaddres3 + off3), buffer, buffer.Length, out refer);
 			int newaddres4 = BitConverter.ToInt32(buffer, 0);
 			IntPtr addr4 = (IntPtr)(newaddres4);
 
-			ReadProcessMemory(process.Handle, (newaddres4 + 0x18), buffer, buffer.Length, out refer);
+			ReadProcessMemory(process.Handle, (newaddres4 + off4), buffer, buffer.Length, out refer);
 			int newaddres5 = BitConverter.ToInt32(buffer, 0);
 			IntPtr addr5 = (IntPtr)(newaddres5);
 
-			buffer = StructureToByteArray(10);
-			bool written = WriteProcessMemory(process.Handle, (newaddres5 + 0x588), buffer, buffer.Length, out refer);
+			buffer = StructureToByteArray(69);
+			bool written = WriteProcessMemory(process.Handle, (newaddres5 + off5), buffer, buffer.Length, out refer);
 			buffer = new byte[4];
-			ReadProcessMemory(process.Handle, (newaddres5 + 0x588), buffer, buffer.Length, out refer);
+			ReadProcessMemory(process.Handle, (newaddres5 + off5), buffer, buffer.Length, out refer);
 			int value = BitConverter.ToInt32(buffer, 0);
-			if (value == 10 && written)
+			if (value == 69)
 			{
 				return true;
 			}
 			else
 			{
-				Console.WriteLine("");
-				Console.WriteLine("===============================================================");
-				Console.WriteLine("Could not write right MemoryAdress: ");
-				Console.WriteLine("0 HEX: " + baseAddr.ToString("X"));
-				Console.WriteLine("1 HEX: " + newaddres1.ToString("X"));
-				Console.WriteLine("2 HEX: " + newaddres2.ToString("X"));
-				Console.WriteLine("3 HEX: " + newaddres3.ToString("X"));
-				Console.WriteLine("4 HEX: " + newaddres4.ToString("X"));
-				Console.WriteLine("5 HEX: " + newaddres5.ToString("X"));
-				Console.WriteLine("5 HEX: " + newaddres5.ToString("X"));
-				Console.WriteLine("===============================================================");
-				Console.WriteLine("");
 				return false;
 			}
 		}
+
+        public static bool TryhackMoney(int value, Int32 off1, Int32 off2, Int32 off3, Int32 off4, Int32 off5)
+        {
+            byte[] buffer = new byte[4];
+            IntPtr baseAddr = new IntPtr(gameModul + playerbase);
+            ReadProcessMemory(process.Handle, baseAddr, buffer, buffer.Length, out int refer);
+            IntPtr newaddres1 = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres1, off1), buffer, buffer.Length, out refer);
+            IntPtr newaddres2 = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres2, off2), buffer, buffer.Length, out refer);
+            IntPtr newaddres3 = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres3, off3), buffer, buffer.Length, out refer);
+            IntPtr newaddres4 = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+            ReadProcessMemory(process.Handle, IntPtr.Add(newaddres4, off4), buffer, buffer.Length, out refer);
+            IntPtr newaddres5 = new IntPtr(BitConverter.ToInt32(buffer, 0));
+
+            buffer = StructureToByteArray(value);
+            bool written = WriteProcessMemory(process.Handle, IntPtr.Add(newaddres5, off5), buffer, buffer.Length, out refer);
+            buffer = new byte[4];
+            IntPtr checkAddr = new IntPtr(gameModul + 0x5318E4);
+            ReadProcessMemory(process.Handle, checkAddr, buffer, buffer.Length, out refer);
+            int newvalue = BitConverter.ToInt32(buffer, 0);
+            if (value == newvalue)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
 		static public int DisplayMenu(bool next)
 		{
 			Console.WriteLine("CnC Hack");
