@@ -1,9 +1,0 @@
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\bin\Release\CnC_Hack.exe.config
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\bin\Release\CnC_Hack.exe
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.csproj.CoreCompileInputs.cache
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.exe
-F:\Shared\Projekte\CnC_Hack\CnC_Hack\bin\Release\CnC_Hack.exe.config
-F:\Shared\Projekte\CnC_Hack\CnC_Hack\bin\Release\CnC_Hack.exe
-F:\RS\CnC_Hack.exe
-F:\Shared\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.csproj.CoreCompileInputs.cache
-F:\Shared\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.exe
