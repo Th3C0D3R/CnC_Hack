@@ -1,6 +1,0 @@
-component_depth: 1
-languages:
-- csharp
-exclude:
-- /CnC_Hack/bin/.*
-- /CnC_Hack/obj/.*
