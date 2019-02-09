@@ -8,6 +8,13 @@
 ##### 4. PROFIT $$$
 <br/>
 
+### Build on your own:
+#### 1. Download (zip or clone it)
+#### 2. Open in Visual Studio (created with 2017 Professional)
+#### 3. Change stuff like Outputpath of exe and so on...
+#### 4. Build Solution
+<br/>
+
 ### Features:
 ##### * Gets you 696969$ Money and locks it there (simply set the value every second)
 ##### * Sets and Lock Rank Points to 69 (no more worries about which feature you want to unlock)
