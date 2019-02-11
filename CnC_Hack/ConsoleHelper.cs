@@ -9,44 +9,6 @@ namespace CnC_Hack
 {
 	class ConsoleHelper
 	{
-		public int WriteGameMenu(string[] choiceItems)
-		{
-			int curItem = 0, c;
-			ConsoleKeyInfo key;
-			do
-			{
-				Console.Clear();
-				Console.WriteLine("================ CnC Generals Hack V1 ================");
-				Console.WriteLine("");
-				// The loop that goes through all of the menu items.
-				for (c = 0; c < choiceItems.Length; c++)
-				{
-					if (curItem == c)
-					{
-						Console.Write(">>");
-						Console.WriteLine(choiceItems[c]);
-					}
-					else
-					{
-						Console.WriteLine(choiceItems[c]);
-					}
-				}
-				Console.WriteLine("");
-				Console.Write("Select your choice with the arrow keys.");
-				key = Console.ReadKey(true);
-				if (key.Key.ToString() == "DownArrow")
-				{
-					curItem++;
-					if (curItem > choiceItems.Length - 1) curItem = 0;
-				}
-				else if (key.Key.ToString() == "UpArrow")
-				{
-					curItem--;
-					if (curItem < 0) curItem = Convert.ToInt16(choiceItems.Length - 1);
-				}
-			} while (key.KeyChar != 13);
-			return curItem;
-		}
 		public int WriteHackMenu(string[] menuItems, bool hackActive, bool gubed)
 		{
 			int curItem = 0, c;
