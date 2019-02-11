@@ -2,3 +2,6 @@ F:\RS\CnC_Hack.exe
 F:\Shared\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.csproj.CoreCompileInputs.cache
 F:\Shared\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.exe
 F:\Shared\CnC_Hack.exe
+C:\Users\Nico\Desktop\CnC_Hack.exe
+U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.csproj.CoreCompileInputs.cache
+U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Release\CnC_Hack.exe
