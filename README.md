@@ -1,6 +1,12 @@
 # CnC_Hack V2.0 ( Support for "Generals" and "Generals - Zero Hour" )
 <br/>
 
+### Supports:
+##### Generals 1.8 (Current Patch)
+##### Zero Hour 1.04 (Current Patch)
+##### Mission or Skirmish, both works!
+##### DID NOT NET ONLINE/LAN GAMES!
+
 ### Steps:
 ##### 1. Start Hack
 ##### 2. Start Game within 30 seconds
