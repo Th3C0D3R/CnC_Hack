@@ -1,4 +1,5 @@
 # CnC_Hack V2.0 ( Support for "Generals" and "Generals - Zero Hour" )
+Forumpost: https://www.unknowncheats.me/forum/generals-and-zero-hour/320827-generals-zero-hour-hack.html
 <br/>
 
 ### Supports:
