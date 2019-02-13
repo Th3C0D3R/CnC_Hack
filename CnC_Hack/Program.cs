@@ -15,8 +15,17 @@ namespace CnC_Hack
 {
     class Program
     {
-        #region "Stuff"
-        [DllImport("kernel32.dll", SetLastError = true)]
+		#region "OffsetEnum"
+		public enum OffsetType
+		{
+			[Description("Playerbase")]
+			PlayerBase
+
+		}
+		#endregion
+
+		#region "Stuff"
+		[DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] buffer, int size, out int lpNumberOfBytesWritten);
@@ -39,6 +48,7 @@ namespace CnC_Hack
             Offsets[0, 6] = new int[] { 0x132E9C, 0x132EA7, 0x132EA8 }; // Unit + Buildings
             Offsets[0, 7] = new int[] { 0x1 }; // Units
             Offsets[0, 8] = new int[] { 0x90 }; // Buildings
+			Offsets[0, 9] = new int[] { 0xC, 0x40}; // Radar
 
             //Zero Hour Offsets
             Offsets[1, 0] = new int[] { 0x62B600 };//PlayerBase Zero Hour
@@ -50,10 +60,12 @@ namespace CnC_Hack
             Offsets[1, 6] = new int[] { 0x13A0FC, 0x13A107, 0x13A108 }; // Unit + Buildings
             Offsets[1, 7] = new int[] { 0x1 }; // Units
             Offsets[1, 8] = new int[] { 0x90 }; // Buildings
-        }
-        #endregion
+			Offsets[1, 9] = new int[] { 0xC, 0x44 }; // Radar
+		}
+		#endregion
 
-        static bool hackActive = false;
+		#region "Vars & Obj"
+		static bool hackActive = false;
         static bool isZeroHour = false;
         static bool gubed = false;
         static readonly string[] menuItems = { "Start Hack", "Debug", "Exit" };
@@ -62,8 +74,9 @@ namespace CnC_Hack
         static CancellationTokenSource ts = new CancellationTokenSource();
         static CancellationToken ct = ts.Token;
         static List<String> consoleoutput = new List<string>();
-
-        static unsafe void Main(string[] args)
+		#endregion
+		
+		static unsafe void Main(string[] args)
         {
             if (args.Length == 1)
             {
@@ -128,7 +141,8 @@ namespace CnC_Hack
             WriteProcessMemory(process.Handle, baseAddrUnit, bufferU, 1, out int refer);
             WriteProcessMemory(process.Handle, baseAddrBuilding, bufferB, 1, out refer);
             WriteProcessMemory(process.Handle, baseAddrBuilding2, bufferB, 1, out refer);
-            return 1;
+			Hack(1, Offsets[i, 9][0], Offsets[i, 9][1]); //Activate Radar
+			return 1;
         }
         static public void RenderMenu()
         {
@@ -143,7 +157,7 @@ namespace CnC_Hack
                         {
                             int u = isZeroHour ? 1 : 0;
                             Hack(5000, Offsets[u, 3][0], Offsets[u, 3][1]); //RankEXP -> LevelUp to get StarRank
-                            HackRadar();
+							HackRadar();
                             Task.Factory.StartNew(() =>
                             {
                                 DoHack();

@@ -1,6 +1,0 @@
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\bin\Debug\CnC_Hack.exe
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\bin\Debug\CnC_Hack.pdb
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Debug\CnC_Hack.csprojAssemblyReference.cache
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Debug\CnC_Hack.csproj.CoreCompileInputs.cache
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Debug\CnC_Hack.exe
-U:\Projekte\Projekte\CnC_Hack\CnC_Hack\obj\Debug\CnC_Hack.pdb
