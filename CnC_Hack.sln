@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnC_Hack", "CnC_Hack\CnC_Hack.csproj", "{056080FB-9EA0-4A81-863D-1B44850EA921}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnC_Overlay", "CnC_Overlay\CnC_Overlay.csproj", "{1105D6B3-ACFF-44E2-B1C4-0AC7388F4097}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{056080FB-9EA0-4A81-863D-1B44850EA921}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{056080FB-9EA0-4A81-863D-1B44850EA921}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{056080FB-9EA0-4A81-863D-1B44850EA921}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1105D6B3-ACFF-44E2-B1C4-0AC7388F4097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1105D6B3-ACFF-44E2-B1C4-0AC7388F4097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1105D6B3-ACFF-44E2-B1C4-0AC7388F4097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1105D6B3-ACFF-44E2-B1C4-0AC7388F4097}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

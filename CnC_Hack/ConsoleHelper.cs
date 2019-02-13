@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using static CnC_Hack.Program;
 
 namespace CnC_Hack
 {
-	class ConsoleHelper
+	internal class ConsoleHelper
 	{
-		public int WriteHackMenu(string[] menuItems, bool hackActive, bool gubed)
+		public MenuItem WriteHackMenu(string[] menuItems, bool hackActive, bool gubed, bool overlay, bool zeroHour)
 		{
 			int curItem = 0, c;
 			ConsoleKeyInfo key;
@@ -22,28 +19,23 @@ namespace CnC_Hack
 				{
 					Console.Clear();
 					Console.WriteLine("");
-					Console.WriteLine("================ CnC Generals Hack V1 ================");
+					Console.WriteLine("================ CnC Generals/Zero Hour Hack V3 ================");
 					Console.WriteLine("");
+					Console.WriteLine("Current Game: Command & Conquer - "+ (zeroHour ? "Zero Hour" : "Generals"));
+					Console.WriteLine("");
+
+					string[] _menuitem = menuItems;
 					// The loop that goes through all of the menu items.
-					for (c = 0; c < menuItems.Length; c++)
+					for (c = 0; c < _menuitem.Length; c++)
 					{
-						if (hackActive)
-							menuItems[0] = "Stop Hack";
-						else
-							menuItems[0] = "Start Hack";
-						if (curItem == c)
-						{
-							if (!gubed) { if (menuItems[c] == "Debug") menuItems[c] = "Debug [Not Available]"; }
-							else { if (menuItems[c] == "Debug" || menuItems[c] == "Debug [Not Available]") menuItems[c] = "Debug"; }
-							Console.Write(">>");
-							Console.WriteLine(menuItems[c]);
-						}
-						else
-						{
-							if (!gubed) { if (menuItems[c] == "Debug") menuItems[c] = "Debug [Not Available]"; }
-							else { if (menuItems[c] == "Debug" || menuItems[c] == "Debug [Not Available]") menuItems[c] = "Debug"; }
-							Console.WriteLine(menuItems[c]);
-						}
+						if (hackActive) _menuitem[MenuItem.Hack.GetHashCode()] = "Stop Hack";
+						else _menuitem[MenuItem.Hack.GetHashCode()] = "Start Hack";
+						if (overlay) _menuitem[MenuItem.Overlay.GetHashCode()] = "Hide Overlay";
+						else _menuitem[MenuItem.Overlay.GetHashCode()] = "Show Overlay";
+						if (!gubed) { if (_menuitem[MenuItem.Debug.GetHashCode()] == "Debug") _menuitem[MenuItem.Debug.GetHashCode()] = "Debug [Not Available]"; }
+						else { if (_menuitem[MenuItem.Debug.GetHashCode()] == "Debug" || _menuitem[MenuItem.Debug.GetHashCode()] == "Debug [Not Available]") _menuitem[MenuItem.Debug.GetHashCode()] = "Debug"; }
+						if (curItem == c) Console.Write(">> ");
+						Console.WriteLine(_menuitem[c]);
 					}
 					Console.WriteLine("");
 					Console.Write("Select your choice with the arrow keys.");
@@ -51,15 +43,15 @@ namespace CnC_Hack
 					if (key.Key.ToString() == "DownArrow")
 					{
 						curItem++;
-						if (curItem > menuItems.Length - 1) curItem = 0;
+						if (curItem > _menuitem.Length - 1) curItem = 0;
 					}
 					else if (key.Key.ToString() == "UpArrow")
 					{
 						curItem--;
-						if (curItem < 0) curItem = Convert.ToInt16(menuItems.Length - 1);
+						if (curItem < 0) curItem = Convert.ToInt16(_menuitem.Length - 1);
 					}
 				} while (key.KeyChar != 13);
-				return curItem;
+				return (MenuItem)curItem;
 			}
 		}
 		public void WriteLog(StreamWriter sw, int gameModul, int[,][] Offsets)
@@ -128,7 +120,8 @@ namespace CnC_Hack
 			sw.WriteLine("");
 		}
 	}
-	static class Extension
+
+	internal static class Extension
 	{
 		public static string GetDescription(this Enum e)
 		{
