@@ -1,0 +1,8 @@
+﻿################################################################################
+# Diese .gitignore-Datei wurde von Microsoft(R) Visual Studio automatisch erstellt.
+################################################################################
+
+/CnC_Hack/MapHack.cs
+/.vs/CnC_Hack/
+/CnC_Hack/obj/
+/CnC_Hack/bin/
